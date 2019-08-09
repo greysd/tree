@@ -1,0 +1,4 @@
+A test of first week in courser MIPT GOLANG course
+
+Usage: go run main.go . [-f]
+ 	-f print files. By default program prints only dirs

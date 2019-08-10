@@ -22,7 +22,7 @@ func readDirCustom(dirname string, printFiles bool) ([]os.FileInfo, error) {
 	return files, err
 }
 
-func printFile(prefix string, name string, printFiles bool, size int64, isDir bool, isLast bool) {
+func printFile(out io.Writer, prefix string, name string, printFiles bool, size int64, isDir bool, isLast bool) {
 	var graphSymbols, sizeSymbols string
 	if isLast {
 		graphSymbols = "└───"
@@ -35,10 +35,10 @@ func printFile(prefix string, name string, printFiles bool, size int64, isDir bo
 		sizeSymbols = "(" + strconv.FormatInt(size, 10) + "b)"
 	}
 	if isDir {
-		fmt.Printf("%v%v%v\n", prefix, graphSymbols, name)
+		fmt.Fprintf(out, "%v%v%v\n", prefix, graphSymbols, name)
 	} else {
 
-		fmt.Printf("%v%v%v "+sizeSymbols+"\n", prefix, graphSymbols, name)
+		fmt.Fprintf(out, "%v%v%v "+sizeSymbols+"\n", prefix, graphSymbols, name)
 	}
 }
 
@@ -47,17 +47,17 @@ func dirTreeRecur(out io.Writer, path string, printFiles bool, prefix string) er
 	for index, f := range files {
 		if index == len(files)-1 {
 			if f.IsDir() {
-				printFile(prefix, f.Name(), printFiles, 0, true, true)
+				printFile(out, prefix, f.Name(), printFiles, 0, true, true)
 				dirTreeRecur(out, path+string(os.PathSeparator)+f.Name(), printFiles, prefix+"    ")
 			} else {
-				printFile(prefix, f.Name(), printFiles, f.Size(), false, true)
+				printFile(out, prefix, f.Name(), printFiles, f.Size(), false, true)
 			}
 		} else {
 			if f.IsDir() {
-				printFile(prefix, f.Name(), printFiles, 0, true, false)
+				printFile(out, prefix, f.Name(), printFiles, 0, true, false)
 				dirTreeRecur(out, path+string(os.PathSeparator)+f.Name(), printFiles, prefix+"│   ")
 			} else {
-				printFile(prefix, f.Name(), printFiles, f.Size(), false, false)
+				printFile(out, prefix, f.Name(), printFiles, f.Size(), false, false)
 			}
 		}
 
